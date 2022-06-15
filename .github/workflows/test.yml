@@ -12,9 +12,9 @@ on:
 
 jobs:
   unit-test:
-	steps:
-	  - uses: actions/checkout@v3
-	  - uses: actions/setup-go@v3
-		with:
-		  go-version: '1.13.8'
-	  - run: go test github.com/leyantech/jstart/jstart
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+           go-version: '1.13.8'
+    - run: go test github.com/leyantech/jstart/jstart
