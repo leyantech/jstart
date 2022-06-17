@@ -11,8 +11,21 @@ on:
       - '**.md'
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: lint
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.13.8'
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.29
   test:
     runs-on: ubuntu-latest
+    name: unit-test
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3

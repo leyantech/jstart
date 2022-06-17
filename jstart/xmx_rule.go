@@ -55,22 +55,16 @@ func evaluateXmxExpression(memoryLimit int64, expressionString string) (int64, e
 	switch v := result.(type) {
 	case float32:
 		xmx = int64(v)
-		break
 	case float64:
 		xmx = int64(v)
-		break
 	case int:
 		xmx = int64(v)
-		break
 	case uint64:
 		xmx = int64(v)
-		break
 	case uint32:
 		xmx = int64(v)
-		break
 	case int64:
 		xmx = v
-		break
 	default:
 		ERROR.Printf("invalid xmx evaluation result type: %s(%v)", reflect.TypeOf(result), result)
 		return 0, fmt.Errorf("invalid xmx evaluation result type")
