@@ -6,9 +6,7 @@ import (
 )
 
 func TestXmxExpression(t *testing.T) {
-	var xmx int64
-	var err error
-	xmx, err = evaluateXmxExpression(1024, "quota*0.66")
+	xmx, err := evaluateXmxExpression(1024, "quota*0.66")
 	assert.Nil(t, err)
 	assert.Equal(t, int64(675), xmx)
 
