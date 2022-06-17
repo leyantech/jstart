@@ -24,13 +24,13 @@ func TestXmxExpression(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, int64(512), xmx)
 
-	xmx, err = evaluateXmxExpression(1024, "quota*0.01")
+	_, err = evaluateXmxExpression(1024, "quota*0.01")
 	assert.NotNil(t, err)
 
-	xmx, err = evaluateXmxExpression(1024, "quota")
+	_, err = evaluateXmxExpression(1024, "quota")
 	assert.NotNil(t, err)
 
-	xmx, err = evaluateXmxExpression(1024, "quota>100")
+	_, err = evaluateXmxExpression(1024, "quota>100")
 	assert.NotNil(t, err)
 }
 
