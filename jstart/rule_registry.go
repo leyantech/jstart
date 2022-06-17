@@ -6,7 +6,7 @@ type RuleRegistry struct {
 
 func NewRuleRegistry() *RuleRegistry {
 	return &RuleRegistry{
-		rules: make(map[string]Rule, 0),
+		rules: make(map[string]Rule),
 	}
 }
 
