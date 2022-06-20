@@ -32,10 +32,16 @@ func splitStringToMap(s string) map[string]string {
 	return m
 }
 
+/**
+apollo(https://github.com/apolloconfig/apollo) is a configuration management system. This loader load rule parameters
+from the application namespace of a given apollo app id.
+
+rule parameters are encoded with format '<key>=<value>;<key>=<value>...'(e.g. 'xmx=quota-512;gc=auto;nmt=off').
+ */
 type ApolloLoader struct {
-	ApolloUrl     string
-	ApolloAppId   string
-	PropertyNames []string
+	ApolloUrl     string    // apollo's api endpoint
+	ApolloAppId   string    // apollo app id
+	PropertyNames []string   // property names to search for rule parameters, the first one with non-empty value will be effective.
 }
 
 type apolloResponse struct {
@@ -70,15 +76,12 @@ func (a ApolloLoader) readJstartSettings(configMap map[string]string) RuleParams
 	return nil
 }
 
-func (a *ApolloLoader) Load() RuleParams {
-	/**
-	  从 apollo 的 application namespace 中按以下顺序搜索启动参数，直到找到确定的值，如果 apollo 中没有配置，则返回 nil
+/**
+load rule parameters from apollo configuration management system.
 
-	  1. jstart.<app>.<proc>.<instance>
-	  2. jstart.<app>.<proc>
-	  3. jstart.<app>
-	  4. jstart
-	*/
+homepage of apollo: https://github.com/apolloconfig/apollo
+ */
+func (a *ApolloLoader) Load() RuleParams {
 	configMap, err := a.loadConfigMap()
 	if err != nil {
 		WARN.Printf("failed to load config from apollo: %s", err)
