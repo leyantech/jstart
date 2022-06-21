@@ -33,6 +33,7 @@ func (g *GcLogRule) ConvertOptions(jdkVersion string, originalOptions []string, 
 		} else {
 			gcLogOption = gcLogOption + ":stdout"
 		}
+		gcLogOption = gcLogOption + ":time,level,tags"
 		return append(originalOptions, "-XX:+HeapDumpOnOutOfMemoryError", gcLogOption)
 	}
 }
