@@ -13,4 +13,6 @@ func TestRemoteDebugRule(t *testing.T) {
 	assert.Equal(t, []string{}, options)
 	options = rule.ConvertOptions("8", []string{}, "on")
 	assert.Equal(t, []string{"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=3330"}, options)
+	options = rule.ConvertOptions("9", []string{}, "on")
+	assert.Equal(t, []string{"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3330"}, options)
 }
