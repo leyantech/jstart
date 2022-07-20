@@ -16,10 +16,16 @@ func (*RemoteDebugRule) ConvertOptions(jdkVersion string, originalOptions []stri
 	// remove jdwp related options provided in original options
 	result := RemoveOptionsWithPrefix(originalOptions, "-agentlib:jdwp=")
 	enableRemoteDebug := ruleParam == "on" || (ruleParam == "auto" && isInTestCluster())
-	if enableRemoteDebug {
+	if !enableRemoteDebug {
+		return result
+	}
+
+	// ref: https://www.oracle.com/java/technologies/javase/9-notes.html#JDK-8041435
+	if jdkVersion == "8" {
 		debugOptions := []string{"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=3330"}
 		return append(debugOptions, result...)
 	} else {
-		return result
+		debugOptions := []string{"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:3330"}
+		return append(debugOptions, result...)
 	}
 }
