@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Knetic/govaluate"
 	"reflect"
+	"strings"
 )
 
 var (
@@ -11,7 +12,7 @@ var (
 	minimumNonHeap int64 = 64
 )
 
-// a jstart rule for setting Xmx by multiple total memory limit with specific ratio
+// XmxRule setting Xmx and Xms via an arithmetic expression.
 type XmxRule struct {
 }
 
@@ -25,57 +26,82 @@ func (r *XmxRule) ConvertOptions(jdkVersion string, originalOptions []string, ru
 		ERROR.Printf("failed to detect memory limit, wont add any xmx options: %s", err)
 		return originalOptions
 	}
-	xmx, err := evaluateXmxExpression(memoryLimit, ruleParam)
+	xmxEvaluateVariables := make(map[string]int64)
+	xmxEvaluateVariables["quota"] = memoryLimit
+	parts := strings.Split(ruleParam, ",")
+	if len(parts) > 2 {
+		ERROR.Printf("too many comma separated parts in xmx rule setting")
+		return originalOptions
+	}
+
+	xmxExpression := parts[0]
+	xmx, err := evaluateArithmeticExpression(xmxExpression, minimumXmx, memoryLimit-minimumNonHeap, xmxEvaluateVariables)
 	if err != nil {
 		return originalOptions
+	}
+
+	if len(parts) != 2 {
+		return append(RemoveOptionsWithPrefix(originalOptions, "-Xmx"), fmt.Sprintf("-Xmx%dm", xmx))
+	}
+
+	xmsExpression := parts[1]
+	xmsEvaluateVariables := make(map[string]int64)
+	xmsEvaluateVariables["xmx"] = xmx
+
+	// -Xms should be greater than 1MB, according to: https://docs.oracle.com/en/java/javase/13/docs/specs/man/java.html
+	xms, err := evaluateArithmeticExpression(xmsExpression, 1, xmx, xmsEvaluateVariables)
+	if err != nil {
+		ERROR.Printf("failed to evaluate xms %s, will leave -Xmx unchanged", err)
+		return append(RemoveOptionsWithPrefix(originalOptions, "-Xmx"), fmt.Sprintf("-Xmx%dm", xmx))
 	} else {
 		return append(RemoveOptionsWithPrefix(originalOptions, "-Xmx", "-Xms"),
 			fmt.Sprintf("-Xmx%dm", xmx),
-			fmt.Sprintf("-Xms%dm", xmx),
+			fmt.Sprintf("-Xms%dm", xms),
 		)
 	}
 }
 
-func evaluateXmxExpression(memoryLimit int64, expressionString string) (int64, error) {
+func evaluateArithmeticExpression(expressionString string, minimum, maximum int64, variables map[string]int64) (int64, error) {
 	expression, err := govaluate.NewEvaluableExpression(expressionString)
 	if err != nil {
-		ERROR.Printf("not valid expression for xmx: %s", err)
+		ERROR.Printf("not valid expression for result: %s", err)
 		return 0, err
 	}
-	params := map[string]interface{}{
-		"quota": memoryLimit,
+	params := make(map[string]interface{})
+	for k, v := range variables {
+		params[k] = v
 	}
-	result, err := expression.Evaluate(params)
+	evaluated, err := expression.Evaluate(params)
 	if err != nil {
-		ERROR.Printf("failed to evaluate expression %s : %s, wont add any xmx options", expressionString, err)
+		ERROR.Printf("failed to evaluate expression %s : %s, wont add any result options", expressionString, err)
 		return 0, err
 	}
 
-	var xmx int64
-	switch v := result.(type) {
+	var result int64
+	switch v := evaluated.(type) {
 	case float32:
-		xmx = int64(v)
+		result = int64(v)
 	case float64:
-		xmx = int64(v)
+		result = int64(v)
 	case int:
-		xmx = int64(v)
+		result = int64(v)
 	case uint64:
-		xmx = int64(v)
+		result = int64(v)
 	case uint32:
-		xmx = int64(v)
+		result = int64(v)
 	case int64:
-		xmx = v
+		result = v
 	default:
-		ERROR.Printf("invalid xmx evaluation result type: %s(%v)", reflect.TypeOf(result), result)
-		return 0, fmt.Errorf("invalid xmx evaluation result type")
+		ERROR.Printf("invalid result evaluation evaluated type: %s(%v)", reflect.TypeOf(evaluated), evaluated)
+		return 0, fmt.Errorf("invalid evaluated type")
 	}
-	if xmx < minimumXmx {
-		ERROR.Printf("too small xmx: %d", xmx)
-		return 0, fmt.Errorf("xmx too small")
-	} else if xmx >= (memoryLimit - minimumNonHeap) {
-		ERROR.Printf("too large xmx: %d, which will lead few space for non heap usage: %d", xmx, memoryLimit-xmx)
-		return 0, fmt.Errorf("xmx too large")
+	if result < minimum {
+		ERROR.Printf("too small result: %d", result)
+		return 0, fmt.Errorf("result too small")
+	} else if result >= maximum {
+		ERROR.Printf("too large result: %d, which will lead few space for non heap usage: %d", result, maximum)
+		return 0, fmt.Errorf("result too large")
 	}
-	INFO.Printf("xmx rule %s evaluated to %dMB", expressionString, xmx)
-	return xmx, nil
+	INFO.Printf("%s evaluated to %dMB with %v", expressionString, result, variables)
+	return result, nil
 }

@@ -5,35 +5,43 @@ import (
 	"testing"
 )
 
-func TestXmxExpression(t *testing.T) {
-	xmx, err := evaluateXmxExpression(1024, "quota*0.66")
+func TestArithmeticExpressionEval(t *testing.T) {
+	variables := make(map[string]int64)
+	variables["quota"] = 1024
+	maxXmx := 1024 - minimumNonHeap
+	xmx, err := evaluateArithmeticExpression("quota*0.66", minimumXmx, maxXmx, variables)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(675), xmx)
 
-	xmx, err = evaluateXmxExpression(1024, "quota*2/3")
+	xmx, err = evaluateArithmeticExpression("quota*2/3", minimumXmx, maxXmx, variables)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(682), xmx)
 
-	xmx, err = evaluateXmxExpression(1024, "0.66*quota")
+	xmx, err = evaluateArithmeticExpression("0.66*quota", minimumXmx, maxXmx, variables)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(675), xmx)
 
-	xmx, err = evaluateXmxExpression(1024, "quota-512")
+	xmx, err = evaluateArithmeticExpression("quota-512", minimumXmx, maxXmx, variables)
 	assert.Nil(t, err)
 	assert.Equal(t, int64(512), xmx)
 
-	_, err = evaluateXmxExpression(1024, "quota*0.01")
+	_, err = evaluateArithmeticExpression("quota*0.01", minimumXmx, maxXmx, variables)
 	assert.NotNil(t, err)
 
-	_, err = evaluateXmxExpression(1024, "quota")
+	_, err = evaluateArithmeticExpression("quota", minimumXmx, maxXmx, variables)
 	assert.NotNil(t, err)
 
-	_, err = evaluateXmxExpression(1024, "quota>100")
+	_, err = evaluateArithmeticExpression("quota>100", minimumXmx, maxXmx, variables)
 	assert.NotNil(t, err)
 }
 
 func TestXmxRule(t *testing.T) {
 	rule := XmxRule{}
 	options := rule.ConvertOptions("8", []string{"-version"}, "quota*2/3")
-	assert.LessOrEqual(t, len(options), 3)
+	assert.NotEmpty(t, FindOptionWithPrefix(options, "-Xmx"))
+	assert.Empty(t, FindOptionWithPrefix(options, "-Xms"))
+
+	options = rule.ConvertOptions("8", []string{"-version"}, "quota*2/3,xmx-2")
+	assert.NotEmpty(t, FindOptionWithPrefix(options, "-Xmx"))
+	assert.NotEmpty(t, FindOptionWithPrefix(options, "-Xms"))
 }
