@@ -26,32 +26,41 @@ func (r *XmxRule) ConvertOptions(jdkVersion string, originalOptions []string, ru
 		ERROR.Printf("failed to detect memory limit, wont add any xmx options: %s", err)
 		return originalOptions
 	}
-	xmxEvaluateVariables := make(map[string]int64)
-	xmxEvaluateVariables["quota"] = memoryLimit
+
+	var xmxExpression, xmsExpression string
 	parts := strings.Split(ruleParam, ",")
-	if len(parts) > 2 {
+	if len(parts) == 0 {
+		ERROR.Printf("no xmx/xms rule parameter found.")
+		return originalOptions
+	} else if len(parts) == 1 {
+		xmxExpression = parts[0]
+		xmsExpression = "xmx"
+	} else if len(parts) ==2 {
+		xmxExpression = parts[0]
+		xmsExpression = parts[1]
+	} else {
 		ERROR.Printf("too many comma separated parts in xmx rule setting")
 		return originalOptions
 	}
 
-	xmxExpression := parts[0]
+	xmxEvaluateVariables := make(map[string]int64)
+	xmxEvaluateVariables["quota"] = memoryLimit
 	xmx, err := evaluateArithmeticExpression(xmxExpression, minimumXmx, memoryLimit-minimumNonHeap, xmxEvaluateVariables)
 	if err != nil {
 		return originalOptions
 	}
 
-	if len(parts) != 2 {
+	if xmsExpression == "auto" {
 		return append(RemoveOptionsWithPrefix(originalOptions, "-Xmx"), fmt.Sprintf("-Xmx%dm", xmx))
 	}
 
-	xmsExpression := parts[1]
 	xmsEvaluateVariables := make(map[string]int64)
 	xmsEvaluateVariables["xmx"] = xmx
 
 	// -Xms should be greater than 1MB, according to: https://docs.oracle.com/en/java/javase/13/docs/specs/man/java.html
 	xms, err := evaluateArithmeticExpression(xmsExpression, 1, xmx, xmsEvaluateVariables)
 	if err != nil {
-		ERROR.Printf("failed to evaluate xms %s, will leave -Xmx unchanged", err)
+		ERROR.Printf("failed to evaluate xms: %s, will not insert -Xms option", err)
 		return append(RemoveOptionsWithPrefix(originalOptions, "-Xmx"), fmt.Sprintf("-Xmx%dm", xmx))
 	} else {
 		return append(RemoveOptionsWithPrefix(originalOptions, "-Xmx", "-Xms"),
@@ -98,7 +107,7 @@ func evaluateArithmeticExpression(expressionString string, minimum, maximum int6
 	if result < minimum {
 		ERROR.Printf("too small result: %d", result)
 		return 0, fmt.Errorf("result too small")
-	} else if result >= maximum {
+	} else if result > maximum {
 		ERROR.Printf("too large result: %d, which will lead few space for non heap usage: %d", result, maximum)
 		return 0, fmt.Errorf("result too large")
 	}
