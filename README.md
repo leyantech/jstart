@@ -1,5 +1,5 @@
 # jstart
-**Replace the boilerplate `start-java-application.sh`**
+**Replace boilerplate code in `start-java-application.sh`**
 
 ```shell
 limit_in_bytes=$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)
