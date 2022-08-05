@@ -35,7 +35,7 @@ func (r *XmxRule) ConvertOptions(jdkVersion string, originalOptions []string, ru
 	} else if len(parts) == 1 {
 		xmxExpression = parts[0]
 		xmsExpression = "xmx"
-	} else if len(parts) ==2 {
+	} else if len(parts) == 2 {
 		xmxExpression = parts[0]
 		xmsExpression = parts[1]
 	} else {
