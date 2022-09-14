@@ -14,7 +14,7 @@ func (c *C2Rule) Name() string {
 
 func (c *C2Rule) ConvertOptions(jdkVersion string, originalOptions []string, ruleParam string) []string {
 	ruleParam = strings.TrimSpace(ruleParam)
-	level := "1"
+	var level string
 	if ruleParam == "0" || ruleParam == "1" || ruleParam == "2" || ruleParam == "3" || ruleParam == "4" {
 		level = ruleParam
 	} else if ruleParam == "on" {
