@@ -26,7 +26,7 @@ func (c *C2Rule) ConvertOptions(jdkVersion string, originalOptions []string, rul
 		if err != nil {
 			return originalOptions
 		}
-		if limit > 300 * 1024 * 1024 { // 300MB
+		if limit > 300 { // 300MB
 			level = "4"
 		} else {
 			level = "1"
