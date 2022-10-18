@@ -6,7 +6,7 @@ import (
 
 // C2Rule enable/disable jit c2 compilation
 type C2Rule struct {
-	quota int64
+	Quota int64
 }
 
 func (c *C2Rule) Name() string {
@@ -24,8 +24,8 @@ func (c *C2Rule) ConvertOptions(jdkVersion string, originalOptions []string, rul
 		level = "1"
 	} else if ruleParam == "auto" {
 		var limit int64
-		if c.quota > 0 {
-			limit = c.quota
+		if c.Quota > 0 {
+			limit = c.Quota
 		} else {
 			var err error
 			limit, err = getMemoryLimit()
