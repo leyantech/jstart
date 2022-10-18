@@ -14,6 +14,7 @@ var (
 
 // XmxRule setting Xmx and Xms via an arithmetic expression.
 type XmxRule struct {
+	quota int64
 }
 
 func (r *XmxRule) Name() string {
@@ -44,7 +45,11 @@ func (r *XmxRule) ConvertOptions(jdkVersion string, originalOptions []string, ru
 	}
 
 	xmxEvaluateVariables := make(map[string]int64)
-	xmxEvaluateVariables["quota"] = memoryLimit
+	if r.quota > 0 {
+		xmxEvaluateVariables["quota"] = r.quota
+	} else {
+		xmxEvaluateVariables["quota"] = memoryLimit
+	}
 	xmx, err := evaluateArithmeticExpression(xmxExpression, minimumXmx, memoryLimit-minimumNonHeap, xmxEvaluateVariables)
 	if err != nil {
 		return originalOptions
