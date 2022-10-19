@@ -14,20 +14,17 @@ var (
 
 // XmxRule setting Xmx and Xms via an arithmetic expression.
 type XmxRule struct {
-	Quota int64
 }
 
 func (r *XmxRule) Name() string {
 	return "xmx"
 }
 
-func (r *XmxRule) ConvertOptions(jdkVersion string, originalOptions []string, ruleParam string) []string {
-	memoryLimit, err := getMemoryLimit()
-	if err != nil {
-		ERROR.Printf("failed to detect memory limit, wont add any xmx options: %s", err)
+func (r *XmxRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
+	memoryLimit := context.GetMemoryLimit()
+	if memoryLimit <= 0 {
 		return originalOptions
 	}
-
 	var xmxExpression, xmsExpression string
 	parts := strings.Split(ruleParam, ",")
 	if len(parts) == 0 {
@@ -45,11 +42,7 @@ func (r *XmxRule) ConvertOptions(jdkVersion string, originalOptions []string, ru
 	}
 
 	xmxEvaluateVariables := make(map[string]int64)
-	if r.Quota > 0 {
-		xmxEvaluateVariables["quota"] = r.Quota
-	} else {
-		xmxEvaluateVariables["quota"] = memoryLimit
-	}
+	xmxEvaluateVariables["quota"] = memoryLimit
 	xmx, err := evaluateArithmeticExpression(xmxExpression, minimumXmx, memoryLimit-minimumNonHeap, xmxEvaluateVariables)
 	if err != nil {
 		return originalOptions

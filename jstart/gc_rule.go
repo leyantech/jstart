@@ -6,11 +6,10 @@ func (GcRule) Name() string {
 	return "gc"
 }
 
-func (GcRule) ConvertOptions(jdkVersion string, originalOptions []string, ruleParam string) []string {
+func (GcRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
 	var gcOptions []string
-	memLimit, err := getMemoryLimit()
-	if err != nil {
-		WARN.Printf("failed to detect runtime memory limit, will not insert any gc options %s", err)
+	memLimit := context.GetMemoryLimit()
+	if memLimit <= 0 {
 		return originalOptions
 	}
 	if ruleParam == "auto" {

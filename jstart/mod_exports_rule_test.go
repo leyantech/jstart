@@ -7,9 +7,9 @@ import (
 
 func TestModExportsRule(t *testing.T) {
 	rule := ModExportsRule{}
-	options := rule.ConvertOptions("8", []string{}, "")
+	options := rule.ConvertOptions(&Context{JdkVersion: "8"}, []string{}, "")
 	assert.Equal(t, []string{}, options)
 
-	options = rule.ConvertOptions("11", []string{}, "")
+	options = rule.ConvertOptions(&Context{JdkVersion: "11"}, []string{}, "")
 	assert.Equal(t, modExportsOptions, options)
 }

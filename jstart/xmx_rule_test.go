@@ -37,15 +37,15 @@ func TestArithmeticExpressionEval(t *testing.T) {
 
 func TestXmxRule(t *testing.T) {
 	rule := XmxRule{}
-	options := rule.ConvertOptions("8", []string{"-version"}, "quota*2/3")
+	options := rule.ConvertOptions(&Context{JdkVersion: "8", MemoryLimit: 1024}, []string{"-version"}, "quota*2/3")
 	assert.NotEmpty(t, FindOptionWithPrefix(options, "-Xmx"))
 	assert.NotEmpty(t, FindOptionWithPrefix(options, "-Xms"))
 
-	options = rule.ConvertOptions("8", []string{"-version"}, "quota*2/3,xmx-2")
+	options = rule.ConvertOptions(&Context{JdkVersion: "8", MemoryLimit: 1024}, []string{"-version"}, "quota*2/3,xmx-2")
 	assert.NotEmpty(t, FindOptionWithPrefix(options, "-Xmx"))
 	assert.NotEmpty(t, FindOptionWithPrefix(options, "-Xms"))
 
-	options = rule.ConvertOptions("8", []string{"-version"}, "quota*2/3,auto")
+	options = rule.ConvertOptions(&Context{JdkVersion: "8", MemoryLimit: 1024}, []string{"-version"}, "quota*2/3,auto")
 	assert.NotEmpty(t, FindOptionWithPrefix(options, "-Xmx"))
 	assert.Empty(t, FindOptionWithPrefix(options, "-Xms"))
 }

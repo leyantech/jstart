@@ -12,7 +12,7 @@ func (m *MaxMetaSpaceRule) Name() string {
 	return "metaspace"
 }
 
-func (m *MaxMetaSpaceRule) ConvertOptions(jdkVersion string, originalOptions []string, ruleParam string) []string {
+func (m *MaxMetaSpaceRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
 	maxMetaSpaceMB, err := strconv.Atoi(ruleParam)
 	if err != nil {
 		ERROR.Printf("can not parse %s to int", ruleParam)

@@ -7,6 +7,6 @@ import (
 
 func TestLiteralRule(t *testing.T) {
 	rule := LiteralJavaOptionsRule{}
-	options := rule.ConvertOptions("8", []string{}, "-server -XX:+HeapDumpOnOutOfMemoryError")
+	options := rule.ConvertOptions(nil, []string{}, "-server -XX:+HeapDumpOnOutOfMemoryError")
 	assert.Equal(t, []string{"-server", "-XX:+HeapDumpOnOutOfMemoryError"}, options)
 }

@@ -18,7 +18,7 @@ func (r *PredefinedSystemPropertiesRule) Name() string {
 	return r.name
 }
 
-func (r *PredefinedSystemPropertiesRule) ConvertOptions(jdkVersion string, originalOptions []string, ruleParam string) []string {
+func (r *PredefinedSystemPropertiesRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
 	if ruleParam == "off" || ruleParam == "no" || ruleParam == "false" {
 		return originalOptions
 	}
