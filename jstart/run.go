@@ -18,6 +18,13 @@ func Run(registry *RuleRegistry, settingsLoader RuleParamsLoader) {
 	DEBUG.Printf("raw java options: %s, raw application arguments: %s", javaOptions, applicationArguments)
 	ruleParams := settingsLoader.Load()
 	INFO.Printf("jstart rule parameters: %v", ruleParams)
+
+	limit, err := getMemoryLimit()
+	if err != nil {
+		ERROR.Printf("failed to detect memory limit: %s", err)
+	}
+	context := NewContextBuilder().JdkVersion(jdkMajorVersion).MemoryLimit(limit).Build()
+
 	for _, name := range OrderedKeys(ruleParams) {
 		setting := ruleParams[name]
 		rule, exist := registry.Find(name)
@@ -26,7 +33,7 @@ func Run(registry *RuleRegistry, settingsLoader RuleParamsLoader) {
 			continue
 		}
 		DEBUG.Printf("options before apply rule %s : %v", name, javaOptions)
-		javaOptions = rule.ConvertOptions(jdkMajorVersion, javaOptions, setting)
+		javaOptions = rule.ConvertOptions(context, javaOptions, setting)
 		DEBUG.Printf("options after apply rule %s : %v", name, javaOptions)
 	}
 	finalCliArguments := append(javaOptions, applicationArguments...)

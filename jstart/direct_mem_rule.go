@@ -12,7 +12,7 @@ func (d *DirectMemRule) Name() string {
 	return "direct_mem"
 }
 
-func (d *DirectMemRule) ConvertOptions(jdkVersion string, originalOptions []string, ruleParam string) []string {
+func (d *DirectMemRule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
 	ruleParam = strings.TrimSpace(ruleParam)
 	if ruleParam == "" {
 		return originalOptions

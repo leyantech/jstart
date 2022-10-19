@@ -7,9 +7,9 @@ import (
 
 func TestDirectMemRule(t *testing.T) {
 	rule := DirectMemRule{}
-	options := rule.ConvertOptions("8", []string{}, "")
+	options := rule.ConvertOptions(nil, []string{}, "")
 	assert.Equal(t, 0, len(options))
 
-	options = rule.ConvertOptions("8", []string{}, "64")
+	options = rule.ConvertOptions(nil, []string{}, "64")
 	assert.Equal(t, []string{"-XX:MaxDirectMemorySize=64m"}, options)
 }
