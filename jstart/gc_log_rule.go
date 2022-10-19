@@ -6,7 +6,7 @@ func (g *GcLogRule) Name() string {
 	return "gc_log"
 }
 
-func (g *GcLogRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
+func (g *GcLogRule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
 	if context.GetJdkVersion() == "8" {
 		// ref: https://dzone.com/articles/enabling-and-analysing-the-garbage-collection-log
 		gcLogOptions := []string{

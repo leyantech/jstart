@@ -19,12 +19,11 @@ func Run(registry *RuleRegistry, settingsLoader RuleParamsLoader) {
 	ruleParams := settingsLoader.Load()
 	INFO.Printf("jstart rule parameters: %v", ruleParams)
 
-	isProd := os.Getenv("ENV_PRIORITY") != "test"
 	limit, err := getMemoryLimit()
 	if err != nil {
 		ERROR.Printf("failed to detect memory limit: %s", err)
 	}
-	context := NewContextBuilder().JdkVersion(jdkMajorVersion).MemoryLimit(limit).IsProd(isProd).Build()
+	context := NewContextBuilder().JdkVersion(jdkMajorVersion).MemoryLimit(limit).Build()
 
 	for _, name := range OrderedKeys(ruleParams) {
 		setting := ruleParams[name]

@@ -6,7 +6,7 @@ func (NmtRule) Name() string {
 	return "nmt"
 }
 
-func (NmtRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
+func (NmtRule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
 	result := RemoveOptionsWithPrefix(originalOptions, "-XX:NativeMemoryTracking")
 	if ruleParam == "off" {
 		return append(result, "-XX:NativeMemoryTracking=off")

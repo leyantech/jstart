@@ -6,10 +6,11 @@ func (*RemoteDebugRule) Name() string {
 	return "remote_debug"
 }
 
-func (*RemoteDebugRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
+func (*RemoteDebugRule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
 	// remove jdwp related options provided in original options
 	result := RemoveOptionsWithPrefix(originalOptions, "-agentlib:jdwp=")
-	enableRemoteDebug := ruleParam == "on" || (ruleParam == "auto" && !context.IsProd)
+	isInTestCluster := context.GetEnv("ENV_PRIORITY") == "test"
+	enableRemoteDebug := ruleParam == "on" || (ruleParam == "auto" && isInTestCluster)
 	if !enableRemoteDebug {
 		return result
 	}

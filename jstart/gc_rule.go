@@ -6,7 +6,7 @@ func (GcRule) Name() string {
 	return "gc"
 }
 
-func (GcRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
+func (GcRule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
 	var gcOptions []string
 	memLimit := context.GetMemoryLimit()
 	if memLimit <= 0 {

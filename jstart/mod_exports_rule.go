@@ -17,7 +17,7 @@ var modExportsOptions = []string{
 	"--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
 }
 
-func (r *ModExportsRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
+func (r *ModExportsRule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
 	// we only support jdk8+, so wont handle jdkVersion 7/6/5 here.
 	if context.GetJdkVersion() != "8" {
 		originalOptions = append(originalOptions, modExportsOptions...)

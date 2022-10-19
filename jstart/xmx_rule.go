@@ -20,7 +20,7 @@ func (r *XmxRule) Name() string {
 	return "xmx"
 }
 
-func (r *XmxRule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
+func (r *XmxRule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
 	memoryLimit := context.GetMemoryLimit()
 	if memoryLimit <= 0 {
 		return originalOptions

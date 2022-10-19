@@ -1,36 +1,45 @@
 package jstart
 
-type Context struct {
-	JdkVersion  string
-	MemoryLimit int64
-	IsProd      bool
+import "os"
+
+type Context interface {
+	GetJdkVersion() string
+	GetMemoryLimit() int64
+	GetEnv(string) string
 }
 
 type ContextBuilder interface {
 	JdkVersion(jdkVersion string) ContextBuilder
 	MemoryLimit(memoryLimit int64) ContextBuilder
-	IsProd(isProd bool) ContextBuilder
-	Build() *Context
+	Build() *context
 }
 
 type contextBuilder struct {
 	jdkVersion  string
 	memoryLimit int64
-	isProd      bool
 }
 
-func (c *Context) GetJdkVersion() string {
+type context struct {
+	jdkVersion  string
+	memoryLimit int64
+}
+
+func (c *context) GetJdkVersion() string {
 	if c != nil {
-		return c.JdkVersion
+		return c.jdkVersion
 	}
 	return "unknown"
 }
 
-func (c *Context) GetMemoryLimit() int64 {
+func (c *context) GetMemoryLimit() int64 {
 	if c != nil {
-		return c.MemoryLimit
+		return c.memoryLimit
 	}
 	return 0
+}
+
+func (c *context) GetEnv(key string) string {
+	return os.Getenv(key)
 }
 
 func NewContextBuilder() *contextBuilder {
@@ -47,15 +56,9 @@ func (b *contextBuilder) MemoryLimit(memoryLimit int64) ContextBuilder {
 	return b
 }
 
-func (b *contextBuilder) IsProd(isProd bool) ContextBuilder {
-	b.isProd = isProd
-	return b
-}
-
-func (b *contextBuilder) Build() *Context {
-	return &Context{
-		JdkVersion:  b.jdkVersion,
-		MemoryLimit: b.memoryLimit,
-		IsProd:      b.isProd,
+func (b *contextBuilder) Build() *context {
+	return &context{
+		jdkVersion:  b.jdkVersion,
+		memoryLimit: b.memoryLimit,
 	}
 }

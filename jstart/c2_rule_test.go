@@ -16,10 +16,10 @@ func TestC2Rule(t *testing.T) {
 	options = rule.ConvertOptions(nil, []string{"-Xint"}, "3")
 	assert.Equal(t, []string{"-XX:+TieredCompilation", "-XX:TieredStopAtLevel=3"}, options)
 
-	options = rule.ConvertOptions(&Context{MemoryLimit: 1024}, []string{"-Xint"}, "auto")
+	options = rule.ConvertOptions(&context{memoryLimit: 1024}, []string{"-Xint"}, "auto")
 	assert.Equal(t, []string{"-XX:+TieredCompilation", "-XX:TieredStopAtLevel=4"}, options)
 
-	options = rule.ConvertOptions(&Context{MemoryLimit: 300}, []string{"-Xint"}, "auto")
+	options = rule.ConvertOptions(&context{memoryLimit: 300}, []string{"-Xint"}, "auto")
 	assert.Equal(t, []string{"-XX:+TieredCompilation", "-XX:TieredStopAtLevel=1"}, options)
 
 	options = rule.ConvertOptions(nil, []string{"-Xint"}, "autooo")

@@ -12,7 +12,7 @@ func (c *C2Rule) Name() string {
 	return "c2"
 }
 
-func (c *C2Rule) ConvertOptions(context *Context, originalOptions []string, ruleParam string) []string {
+func (c *C2Rule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
 	ruleParam = strings.TrimSpace(ruleParam)
 	var level string
 	if ruleParam == "0" || ruleParam == "1" || ruleParam == "2" || ruleParam == "3" || ruleParam == "4" {
