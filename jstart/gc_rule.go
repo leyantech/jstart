@@ -39,8 +39,9 @@ func (GcRule) ConvertOptions(context Context, originalOptions []string, rulePara
 }
 
 func isIncludeGcParam(javaOptions []string) bool {
+	re, _ := regexp.Compile(`^-XX:+Use[A-Za-z]+GC$`)
 	for _, option := range javaOptions {
-		matched, _ := regexp.Match("^-XX:+Use[A-Za-z]+GC$", []byte(option))
+		matched := re.Match([]byte(option))
 		if matched {
 			return true
 		}
