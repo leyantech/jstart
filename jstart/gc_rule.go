@@ -1,5 +1,7 @@
 package jstart
 
+import "regexp"
+
 type GcRule struct{}
 
 func (GcRule) Name() string {
@@ -7,6 +9,10 @@ func (GcRule) Name() string {
 }
 
 func (GcRule) ConvertOptions(context Context, originalOptions []string, ruleParam string) []string {
+	if isIncludeGcParam(originalOptions) {
+		WARN.Printf("java original option already include gc param...")
+		return originalOptions
+	}
 	var gcOptions []string
 	memLimit := context.GetMemoryLimit()
 	if memLimit <= 0 {
@@ -30,6 +36,16 @@ func (GcRule) ConvertOptions(context Context, originalOptions []string, rulePara
 	}
 	// leave conflict detecting to raw java command
 	return append(gcOptions, originalOptions...)
+}
+
+func isIncludeGcParam(javaOptions []string) bool {
+	for _, option := range javaOptions {
+		matched, _ := regexp.Match("^-XX:+Use[A-Za-z]+GC$", []byte(option))
+		if matched {
+			return true
+		}
+	}
+	return false
 }
 
 func detectGcForMemLimit(memLimit int64) []string {
